@@ -127,7 +127,18 @@ namespace LD36.Generation
 
 		private bool CheckValidRoom(Rectangle tentativeRoom)
 		{
-			return !rooms.Any(room => room.Intersects(tentativeRoom));
+			foreach (Rectangle room in rooms)
+			{
+				Rectangle roomCopy = new Rectangle(room.X, room.Y, room.Width, room.Height);
+				roomCopy.Inflate(1, 1);
+
+				if (roomCopy.Intersects(tentativeRoom))
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 		
 		private void GenerateHallways()

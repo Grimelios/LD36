@@ -85,6 +85,7 @@
     <Compile Include="Timing\Timer.cs" />
     <Compile Include="Timing\TimerCollection.cs" />
     <Compile Include="UI\Dialogue.cs" />
+    <Compile Include="UI\DialogueCharacter.cs" />
     <Compile Include="UI\EscapeDialogue.cs" />
     <Compile Include="UI\StartDialogue.cs" />
     <Compile Include="UI\UIElement.cs" />

@@ -153,6 +153,7 @@ namespace LD36
 			
 			timerCollection.Update(dt);
 			inputGenerator.GenerateInputEvents();
+			userInterface.Update(dt);
 
 			// This assumes that the frame rate will behave and pretty much stay at a constant 60FPS. See
 			// http://www.box2d.org/forum/viewtopic.php?t=4785 for more information).
@@ -168,7 +169,7 @@ namespace LD36
 
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear(Color.SkyBlue);
+			GraphicsDevice.Clear(Color.DarkGray);
 
 			spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, camera.Transform);
 

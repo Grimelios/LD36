@@ -6,11 +6,16 @@ namespace LD36.Timing
 	{
 		private static TimerCollection timerCollection = DIKernel.Get<TimerCollection>();
 
-		public Timer(float duration, Action trigger, bool repeating)
+		public Timer(float duration, Action trigger, bool repeating, bool triggerImmediately = false)
 		{
 			Duration = duration;
 			Repeating = repeating;
 			Trigger = trigger;
+
+			if (triggerImmediately)
+			{
+				trigger();
+			}
 
 			timerCollection.Timers.Add(this);
 		}
@@ -21,5 +26,10 @@ namespace LD36.Timing
 		public bool Repeating { get; }
 
 		public Action Trigger { get; }
+
+		public void Destroy()
+		{
+			timerCollection.Timers.Remove(this);
+		}
 	}
 }
