@@ -11,12 +11,14 @@ namespace LD36.Generation
 		private int pyramidWidth;
 		private int pyramidHeight;
 		private int scaleMultiplier;
+		private int entranceColumn;
 
-		public TileGenerator(int pyramidWidth, int pyramidHeight, int scaleMultiplier)
+		public TileGenerator(int pyramidWidth, int pyramidHeight, int scaleMultiplier, int entranceColumn)
 		{
 			this.pyramidWidth = pyramidWidth;
 			this.pyramidHeight = pyramidHeight;
 			this.scaleMultiplier = scaleMultiplier;
+			this.entranceColumn = entranceColumn;
 		}
 
 		public void Generate(int[,] fullTiles)
@@ -45,7 +47,7 @@ namespace LD36.Generation
 			{
 				for (int j = 0; j < pyramidWidth; j++)
 				{
-					if (fullTiles[j, i] == -1)
+					if (fullTiles[j, i] == -1 && j != entranceColumn)
 					{
 						AddEdgeTiles(fullTiles, tiles, i, j);
 					}
@@ -111,7 +113,7 @@ namespace LD36.Generation
 			{
 				for (int j = 0; j < pyramidWidth; j++)
 				{
-					if (fullTiles[j, i] == -1)
+					if (fullTiles[j, i] == -1 && j != entranceColumn)
 					{
 						AddCornerTiles(fullTiles, tiles, i, j);
 					}

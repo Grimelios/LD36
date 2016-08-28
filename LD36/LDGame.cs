@@ -90,7 +90,7 @@ namespace LD36
 
 			PlayerCharacter player = new PlayerCharacter(new Vector2(-200, PyramidSize * Constants.TileSize * PyramidScaleMultiplier - 100));
 			entityLayers[typeof(PlayerCharacter)].Add(player);
-			//camera.Target = player;
+			camera.Target = player;
 
 			Artifact artifact = new Artifact(new Vector2(300, 0));
 			entityLayers[typeof(Artifact)].Add(artifact);
@@ -144,7 +144,7 @@ namespace LD36
 
 		private void HandleMouseMessage(MouseMessage message)
 		{
-			camera.Position = message.Data.ScreenPosition * 8;
+			//camera.Position = message.Data.ScreenPosition * 8;
 		}
 
 		protected override void Update(GameTime gameTime)

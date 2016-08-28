@@ -19,7 +19,7 @@ namespace LD36.Generation
 		private const int RoomMaximumSize = 12;
 		private const int MaximumPlacementAttempts = 12;
 		private const int IntroRoomWidth = 12;
-		private const int IntroRoomHeight = 8;
+		private const int IntroRoomHeight = 4;
 		private const float ContinuationDiminishingFactor = 0.9f;
 
 		private enum MazeDirections
@@ -35,6 +35,7 @@ namespace LD36.Generation
 		private int pyramidHeight;
 		private int scaleMultiplier;
 		private int maximumRoomRegion;
+		private int entranceColumn;
 		private int[,] fullTiles;
 
 		private Random random;
@@ -55,8 +56,9 @@ namespace LD36.Generation
 		{
 			rooms = new List<Rectangle>();
 
-			//Rectangle introRoom = new Rectangle(IntroRoomWidth / 2, pyramidHeight - IntroRoomHeight - 1, IntroRoomWidth, IntroRoomHeight);
-			//rooms.Add(introRoom);
+			Rectangle introRoom = new Rectangle(IntroRoomWidth / 2, pyramidHeight - IntroRoomHeight - 1, IntroRoomWidth, IntroRoomHeight);
+			rooms.Add(introRoom);
+			entranceColumn = introRoom.Left - 1;
 
 			GenerateRooms();
 			GenerateHallways();
@@ -64,10 +66,10 @@ namespace LD36.Generation
 			BlockHallways();
 			GenerateTexture();
 
-			EdgeGenerator edgeGenerator = new EdgeGenerator(pyramidWidth, pyramidHeight, scaleMultiplier);
+			EdgeGenerator edgeGenerator = new EdgeGenerator(pyramidWidth, pyramidHeight, scaleMultiplier, entranceColumn + 1);
 			edgeGenerator.Generate(fullTiles);
 
-			TileGenerator tileGenerator = new TileGenerator(pyramidWidth, pyramidHeight, scaleMultiplier);
+			TileGenerator tileGenerator = new TileGenerator(pyramidWidth, pyramidHeight, scaleMultiplier, entranceColumn);
 			tileGenerator.Generate(fullTiles);
 		}
 
