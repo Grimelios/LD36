@@ -1,0 +1,18 @@
+{
+	"MasterList": [
+		"Artifact",
+		"Environment.Tilemap",
+		"PlayerCharacter"
+	],
+
+	"UpdateOrder": [
+		"Artifact",
+		"PlayerCharacter"
+	],
+
+	"RenderOrder": [
+		"Artifact",
+		"PlayerCharacter",
+		"Environment.Tilemap"
+	] 
+}
