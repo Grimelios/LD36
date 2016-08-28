@@ -24,10 +24,8 @@ namespace LD36
 	internal class LDGame : Game, IMessageReceiver
 	{
 		private const int PyramidSize = 75;
-		private const int PyramidScaleMultiplier = 2;
-		private const int DebugTextureOffset = 100;
-		private const int DebugTextureScale = 1;
-        private const float Gravity = 9.81f;
+		private const int PyramidScaleMultiplier = 3;
+        private const float Gravity = 25;
 
 		private GraphicsDeviceManager graphics;
 		private SpriteBatch spriteBatch;
@@ -45,6 +43,7 @@ namespace LD36
 
 		private PyramidGenerator pyramidGenerator;
 		private Texture2D mapTexture;
+		private Texture2D lightTexture;
 
 		public LDGame()
 		{
@@ -88,15 +87,9 @@ namespace LD36
 			pyramidGenerator.Generate();
 			mapTexture = pyramidGenerator.Texture;
 
-			PlayerCharacter player = new PlayerCharacter(new Vector2(-200, PyramidSize * Constants.TileSize * PyramidScaleMultiplier - 100));
+			PlayerCharacter player = new PlayerCharacter(new Vector2(775, 7070));
 			entityLayers[typeof(PlayerCharacter)].Add(player);
 			camera.Target = player;
-
-			Artifact artifact = new Artifact(new Vector2(300, 0));
-			entityLayers[typeof(Artifact)].Add(artifact);
-
-			Tilemap introTilemap = new Tilemap(JsonUtilities.Deserialize<TilemapData>("Tilemaps/Intro.json"));
-			entityLayers[typeof(Tilemap)].Add(introTilemap);
 
 			// Creating these objects registers them as message listeners.
 			DIKernel.Get<ArtifactService>();
@@ -107,7 +100,7 @@ namespace LD36
 			messageSystem.Subscribe(MessageTypes.Mouse, this);
 			messageSystem.Send(new StartMessage());
 
-			physicsDebug = DIKernel.Get<PhysicsDebug>();
+			lightTexture = ContentLoader.LoadTexture("LightGradient");
 
 			base.Initialize();
 		}
@@ -144,7 +137,8 @@ namespace LD36
 
 		private void HandleMouseMessage(MouseMessage message)
 		{
-			//camera.Position = message.Data.ScreenPosition * 8;
+			MouseData data = message.Data;
+			//camera.Position = data.ScreenPosition * 10;
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -169,7 +163,8 @@ namespace LD36
 
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear(Color.DarkGray);
+			// This color matches the exterior background color inside the pyramid.
+			GraphicsDevice.Clear(new Color(10, 4, 0));
 
 			spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, camera.Transform);
 
@@ -177,13 +172,11 @@ namespace LD36
 			{
 				entityLayers[type].ForEach(entity => entity.Render(spriteBatch));
 			}
-
-			physicsDebug.Render(spriteBatch);
+			
 			spriteBatch.End();
 
 			spriteBatch.Begin();
-			spriteBatch.Draw(mapTexture, new Vector2(DebugTextureOffset), null, Color.White, 0, Vector2.Zero, DebugTextureScale,
-				SpriteEffects.None, 0);
+			spriteBatch.Draw(lightTexture, Vector2.Zero, Color.White);
 			userInterface.Render(spriteBatch);
 			spriteBatch.End();
 		}

@@ -6,6 +6,7 @@ using FarseerPhysics.Dynamics;
 using LD36.Entities;
 using LD36.Entities.Environment;
 using LD36.Physics;
+using LD36.Structures;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -35,11 +36,12 @@ namespace LD36.Generation
 		private int pyramidHeight;
 		private int scaleMultiplier;
 		private int maximumRoomRegion;
-		private int entranceColumn;
+		private int totalRegions;
 		private int[,] fullTiles;
 
 		private Random random;
 		private List<Rectangle> rooms;
+		private GraphNode<Rectangle> roomGraph;
 
 		public PyramidGenerator(int pyramidSize, int scaleMultiplier)
 		{
@@ -58,7 +60,6 @@ namespace LD36.Generation
 
 			Rectangle introRoom = new Rectangle(IntroRoomWidth / 2, pyramidHeight - IntroRoomHeight - 1, IntroRoomWidth, IntroRoomHeight);
 			rooms.Add(introRoom);
-			entranceColumn = introRoom.Left - 1;
 
 			GenerateRooms();
 			GenerateHallways();
@@ -66,11 +67,14 @@ namespace LD36.Generation
 			BlockHallways();
 			GenerateTexture();
 
-			EdgeGenerator edgeGenerator = new EdgeGenerator(pyramidWidth, pyramidHeight, scaleMultiplier, entranceColumn + 1);
+			EdgeGenerator edgeGenerator = new EdgeGenerator(pyramidWidth, pyramidHeight, scaleMultiplier);
 			edgeGenerator.Generate(fullTiles);
 
-			TileGenerator tileGenerator = new TileGenerator(pyramidWidth, pyramidHeight, scaleMultiplier, entranceColumn);
+			TileGenerator tileGenerator = new TileGenerator(pyramidWidth, pyramidHeight, scaleMultiplier);
 			tileGenerator.Generate(fullTiles);
+
+			ArtifactGenerator artifactGenerator = new ArtifactGenerator(roomGraph, scaleMultiplier);
+			artifactGenerator.Generate();
 		}
 
 		private void GenerateRooms()
@@ -183,6 +187,8 @@ namespace LD36.Generation
 					}
 				}
 			}
+
+			totalRegions = regionCounter;
 		}
 
 		private bool CheckValidMazeStart(int i, int j)
@@ -355,6 +361,8 @@ namespace LD36.Generation
 				Point point = connectorPoints[random.Next(connectorPoints.Count)];
 				fullTiles[point.X, point.Y] = 1000;
 			}
+
+			GenerateRoomGraph(connectorMap);
 		}
 
 		private ConnectorMap GetConnectorMap()
@@ -407,6 +415,34 @@ namespace LD36.Generation
 			}
 
 			return connectorMap;
+		}
+
+		private void GenerateRoomGraph(ConnectorMap connectorMap)
+		{
+			List<Tuple<int, int>> regionTuples = connectorMap.Keys.ToList();
+			List<GraphNode<Rectangle>> nodes = new List<GraphNode<Rectangle>>();
+
+			for (int i = 0; i < totalRegions; i++)
+			{
+				// Rectangle.Empty will indicate that the node contains a hallway rather than a room.
+				Rectangle room = i <= maximumRoomRegion ? rooms[i] : Rectangle.Empty;
+				nodes.Add(new GraphNode<Rectangle>(room));
+			}
+
+			foreach (Tuple<int, int> tuple in regionTuples)
+			{
+				int region1 = tuple.Item1;
+				int region2 = tuple.Item2;
+
+				// Based on the way the map is generated, every tuple will be between room <-> hallway or room <-> room. It's impossible to connect
+				// hallway <-> hallway.
+				GraphNode<Rectangle> node1 = nodes[region1];
+				GraphNode<Rectangle> node2 = nodes[region2];
+				node1.Neighbors.Add(node2);
+				node2.Neighbors.Add(node1);
+			}
+
+			roomGraph = nodes[0];
 		}
 
 		private void BlockHallways()

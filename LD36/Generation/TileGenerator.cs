@@ -7,18 +7,18 @@ namespace LD36.Generation
 	internal class TileGenerator
 	{
 		private const string PyramidTilesheet = "Pyramid";
+		private const int InnerBackgroundTile = 12;
+		private const int OuterBackgroundTile = 13;
 
 		private int pyramidWidth;
 		private int pyramidHeight;
 		private int scaleMultiplier;
-		private int entranceColumn;
 
-		public TileGenerator(int pyramidWidth, int pyramidHeight, int scaleMultiplier, int entranceColumn)
+		public TileGenerator(int pyramidWidth, int pyramidHeight, int scaleMultiplier)
 		{
 			this.pyramidWidth = pyramidWidth;
 			this.pyramidHeight = pyramidHeight;
 			this.scaleMultiplier = scaleMultiplier;
-			this.entranceColumn = entranceColumn;
 		}
 
 		public void Generate(int[,] fullTiles)
@@ -31,7 +31,7 @@ namespace LD36.Generation
 			{
 				for (int j = 0; j < scaledWidth; j++)
 				{
-					tiles[j, i] = -1;
+					tiles[j, i] = InnerBackgroundTile;
 				}
 			}
 
@@ -47,7 +47,7 @@ namespace LD36.Generation
 			{
 				for (int j = 0; j < pyramidWidth; j++)
 				{
-					if (fullTiles[j, i] == -1 && j != entranceColumn)
+					if (fullTiles[j, i] == -1)
 					{
 						AddEdgeTiles(fullTiles, tiles, i, j);
 					}
@@ -57,7 +57,17 @@ namespace LD36.Generation
 
 		private void AddEdgeTiles(int[,] fullTiles, int[,] tiles, int i, int j)
 		{
+			int startX = j * scaleMultiplier;
+			int startY = i * scaleMultiplier;
 			int[] surroundingValues = GetSurroundingValuesEdgeSafe(fullTiles, i, j);
+
+			for (int k = 0; k < scaleMultiplier; k++)
+			{
+				for (int l = 0; l < scaleMultiplier; l++)
+				{
+					tiles[startX + l, startY + k] = OuterBackgroundTile;
+				}
+			}
 			
 			for (int k = 0; k < surroundingValues.Length; k++)
 			{
@@ -66,11 +76,12 @@ namespace LD36.Generation
 					continue;
 				}
 
-				int startX = j * scaleMultiplier;
-				int startY = i * scaleMultiplier;
 				int xIncrement = 0;
 				int yIncrement = 0;
 				int tileValue = k;
+
+				startX = j * scaleMultiplier;
+				startY = i * scaleMultiplier;
 
 				switch (k)
 				{
@@ -113,7 +124,7 @@ namespace LD36.Generation
 			{
 				for (int j = 0; j < pyramidWidth; j++)
 				{
-					if (fullTiles[j, i] == -1 && j != entranceColumn)
+					if (fullTiles[j, i] == -1)
 					{
 						AddCornerTiles(fullTiles, tiles, i, j);
 					}

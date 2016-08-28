@@ -50,6 +50,7 @@
     <Compile Include="Entities\Environment\TilemapData.cs" />
     <Compile Include="Entities\PlayerCharacter.cs" />
     <Compile Include="GameFunctions.cs" />
+    <Compile Include="Generation\ArtifactGenerator.cs" />
     <Compile Include="Generation\EdgeGenerator.cs" />
     <Compile Include="Generation\GenerationUtilities.cs" />
     <Compile Include="Generation\PyramidGenerator.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Service\UserInterfaceService.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="SpriteText.cs" />
+    <Compile Include="Structures\GraphNode.cs" />
     <Compile Include="Timing\Timer.cs" />
     <Compile Include="Timing\TimerCollection.cs" />
     <Compile Include="UI\Dialogue.cs" />

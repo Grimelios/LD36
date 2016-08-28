@@ -11,8 +11,8 @@
 	],
 
 	"RenderOrder": [
+		"Environment.Tilemap",
 		"Artifact",
-		"PlayerCharacter",
-		"Environment.Tilemap"
+		"PlayerCharacter"
 	] 
 }

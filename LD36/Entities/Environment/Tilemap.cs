@@ -31,7 +31,7 @@ namespace LD36.Entities.Environment
 				Vector2 start = convertedPosition + edge.Start;
 				Vector2 end = convertedPosition + edge.End;
 
-				physicsFactory.AttachEdge(body, new Edge(start, end), Units.Meters);
+				physicsFactory.AttachEdge(body, new Edge(start, end, edge.IsGround), Units.Meters);
 			}
 		}
 

@@ -17,17 +17,15 @@ namespace LD36.Generation
 		private int pyramidWidth;
 		private int pyramidHeight;
 		private int scaleMultiplier;
-		private int entranceColumn;
 
 		private Body body;
 		private PhysicsFactory physicsFactory;
 
-		public EdgeGenerator(int pyramidWidth, int pyramidHeight, int scaleMultiplier, int entranceColumn)
+		public EdgeGenerator(int pyramidWidth, int pyramidHeight, int scaleMultiplier)
 		{
 			this.pyramidWidth = pyramidWidth;
 			this.pyramidHeight = pyramidHeight;
 			this.scaleMultiplier = scaleMultiplier;
-			this.entranceColumn = entranceColumn;
 		}
 
 		public void Generate(int[,] fullTiles)
@@ -43,7 +41,7 @@ namespace LD36.Generation
 			{
 				for (int j = 1; j < pyramidWidth - 1; j++)
 				{
-					if (fullTiles[j, i] != -1 && j != entranceColumn)
+					if (fullTiles[j, i] != -1)
 					{
 						int[] surroundingValues = GenerationUtilities.GetSurroundingValues(fullTiles, i, j);
 
@@ -132,7 +130,7 @@ namespace LD36.Generation
 			start *= scaleMultiplier;
 			end *= scaleMultiplier;
 
-			physicsFactory.AttachEdge(body, new Edge(start, end), Units.Meters);
+			physicsFactory.AttachEdge(body, new Edge(start, end, edgeType == EdgeTypes.Bottom), Units.Meters);
 		}
 	}
 }

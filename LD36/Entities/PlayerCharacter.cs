@@ -15,14 +15,18 @@ namespace LD36.Entities
 	internal class PlayerCharacter : Entity, IMessageReceiver
 	{
 		private const int Acceleration = 2000;
-		private const int Deceleration = 1500;
-		private const int MaximumSpeed = 800;
+		private const int Deceleration = 3000;
+		private const int MaximumSpeed = 450;
+		private const int JumpSpeedInitial = 500;
+		private const int JumpSpeedLimited = 50;
 
 		private Sprite sprite;
 		private Body body;
+		private Artifact activeArtifact;
 
 		private bool runningLeft;
 		private bool runningRight;
+		private bool onGround;
 
 		public PlayerCharacter(Vector2 position) : base(position)
 		{
@@ -30,10 +34,39 @@ namespace LD36.Entities
 			body = DIKernel.Get<PhysicsFactory>().CreateRectangle(1, 1, PhysicsConvert.ToMeters(position), Units.Meters, this);
 			body.Friction = 0;
 			body.FixedRotation = true;
+			body.OnCollision += HandleCollision;
+			body.OnSeparation += HandleSeparation;
 
 			MessageSystem messageSystem = DIKernel.Get<MessageSystem>();
 			messageSystem.Subscribe(MessageTypes.Keyboard, this);
 			messageSystem.Subscribe(MessageTypes.Mouse, this);
+		}
+
+		private bool HandleCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
+		{
+			Edge edge = fixtureB.UserData as Edge;
+
+			if (edge != null)
+			{
+				if (edge.IsGround)
+				{
+					onGround = true;
+				}
+			}
+			else
+			{
+				activeArtifact = fixtureB.Body.UserData as Artifact;
+			}
+
+			return true;
+		}
+
+		private void HandleSeparation(Fixture fixtureA, Fixture fixtureB)
+		{
+			if (fixtureB.Body.UserData == activeArtifact)
+			{
+				activeArtifact = null;
+			}
 		}
 
 		public void Receive(GameMessage message)
@@ -54,12 +87,16 @@ namespace LD36.Entities
 		{
 			HandleInteraction(data);
 			HandleRunning(data);
+			HandleJumping(data);
 		}
 
 		private void HandleInteraction(KeyboardData data)
 		{
 			if (data.KeysPressedThisFrame.Contains(Keys.E))
 			{
+				activeArtifact?.InteractionResponse();
+
+				/*
 				ContactEdge contactEdge = body.ContactList;
 
 				while (contactEdge != null)
@@ -75,6 +112,7 @@ namespace LD36.Entities
 
 					contactEdge = contactEdge.Next;
 				}
+				*/
 			}
 		}
 
@@ -98,6 +136,26 @@ namespace LD36.Entities
 				runningLeft = false;
 				runningRight = false;
 			}
+		}
+
+		private void HandleJumping(KeyboardData data)
+		{
+			Vector2 velocity = PhysicsConvert.ToPixels(body.LinearVelocity);
+
+			if (onGround)
+			{
+				if (data.KeysPressedThisFrame.Contains(Keys.Space))
+				{
+					velocity.Y = -JumpSpeedInitial;
+					//onGround = false;
+				}
+			}
+			else if (data.KeysReleasedThisFrame.Contains(Keys.Space) && velocity.Y < -JumpSpeedLimited)
+			{
+				velocity.Y = -JumpSpeedLimited;
+			}
+
+			body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
 		}
 
 		public void HandleMouse(MouseData data)

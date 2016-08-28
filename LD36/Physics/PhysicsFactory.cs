@@ -45,7 +45,7 @@ namespace LD36.Physics
 			Vector2 start = units == Units.Pixels ? PhysicsConvert.ToMeters(edge.Start) : edge.Start;
 			Vector2 end = units == Units.Pixels ? PhysicsConvert.ToMeters(edge.End) : edge.End;
 
-			FixtureFactory.AttachEdge(start, end, body);
+			FixtureFactory.AttachEdge(start, end, body, edge);
 		}
 	}
 }

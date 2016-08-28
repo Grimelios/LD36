@@ -1,5 +1,4 @@
 ﻿using FarseerPhysics.Dynamics;
-using FarseerPhysics.Dynamics.Contacts;
 using LD36.Interfaces;
 using LD36.Messaging;
 using LD36.Physics;
@@ -10,8 +9,8 @@ namespace LD36.Entities
 {
 	internal class Artifact : Entity, IInteractive
 	{
-		private const int BodyWidth = 2;
-		private const int BodyHeight = 3;
+		private const int BodyWidth = 1;
+		private const int BodyHeight = 1;
 
 		private Body body;
 		private Sprite sprite;
@@ -20,13 +19,8 @@ namespace LD36.Entities
 		{
 			sprite = new Sprite("Artifact", position);
 			body = DIKernel.Get<PhysicsFactory>().CreateRectangle(BodyWidth, BodyHeight, PhysicsConvert.ToMeters(position), Units.Meters, this);
-			body.BodyType = BodyType.Static;
-			body.OnCollision += HandleCollision;
-		}
-
-		private bool HandleCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
-		{
-			return false;
+			body.IgnoreGravity = true;
+			body.IsSensor = true;
 		}
 
 		public void InteractionResponse()
@@ -37,6 +31,7 @@ namespace LD36.Entities
 
 		public override void Update(float dt)
 		{
+			sprite.Position = PhysicsConvert.ToPixels(body.Position);
 		}
 
 		public override void Render(SpriteBatch sb)

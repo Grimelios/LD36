@@ -5,7 +5,7 @@ namespace LD36.Service
 {
 	internal class ArtifactService : IMessageReceiver
 	{
-		private const int TotalArtifacts = 1;
+		private const int TotalArtifacts = 3;
 
 		private int artifactsCollected;
 
