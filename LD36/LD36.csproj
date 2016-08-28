@@ -76,6 +76,7 @@
     <Compile Include="Physics\PhysicsConvert.cs" />
     <Compile Include="Physics\PhysicsDebug.cs" />
     <Compile Include="Physics\PhysicsFactory.cs" />
+    <Compile Include="Physics\PhysicsUtilities.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenderFunctions.cs" />
@@ -121,9 +122,6 @@
     <None Include="Content\Fonts\DialogueEscape.spritefont" />
     <None Include="Content\Fonts\DialogueSmall.spritefont" />
     <None Include="Content\Json\Entities.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\Json\Tilemaps\Intro.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

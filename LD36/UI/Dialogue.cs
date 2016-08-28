@@ -48,6 +48,11 @@ namespace LD36.UI
 			}
 		}
 
+		protected void FadeCharacters(float amount)
+		{
+			characters.ForEach(c => c.Fade(amount));
+		}
+
 		public override void Update(float dt)
 		{
 			characters.ForEach(c => c.Update(dt));

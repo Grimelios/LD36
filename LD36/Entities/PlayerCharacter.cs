@@ -14,11 +14,19 @@ namespace LD36.Entities
 {
 	internal class PlayerCharacter : Entity, IMessageReceiver
 	{
+		private const int BodyWidth = 32;
+		private const int BodyHeight = 32;
 		private const int Acceleration = 2000;
 		private const int Deceleration = 3000;
 		private const int MaximumSpeed = 450;
 		private const int JumpSpeedInitial = 500;
 		private const int JumpSpeedLimited = 50;
+
+		private enum PlayerAnimationNames
+		{
+			Idle,
+			Running
+		}
 
 		private Sprite sprite;
 		private Body body;
@@ -31,7 +39,7 @@ namespace LD36.Entities
 		public PlayerCharacter(Vector2 position) : base(position)
 		{
 			sprite = new Sprite("Player", position);
-			body = DIKernel.Get<PhysicsFactory>().CreateRectangle(1, 1, PhysicsConvert.ToMeters(position), Units.Meters, this);
+			body = DIKernel.Get<PhysicsFactory>().CreateRectangle(BodyWidth, BodyHeight, position, Units.Pixels, this);
 			body.Friction = 0;
 			body.FixedRotation = true;
 			body.OnCollision += HandleCollision;
@@ -94,25 +102,8 @@ namespace LD36.Entities
 		{
 			if (data.KeysPressedThisFrame.Contains(Keys.E))
 			{
-				activeArtifact?.InteractionResponse();
-
-				/*
-				ContactEdge contactEdge = body.ContactList;
-
-				while (contactEdge != null)
-				{
-					IInteractive item = contactEdge.Contact.FixtureB.Body.UserData as IInteractive;
-
-					if (item != null)
-					{
-						item.InteractionResponse();
-
-						return;
-					}
-
-					contactEdge = contactEdge.Next;
-				}
-				*/
+				activeArtifact?.InteractionResponse(this);
+				activeArtifact = null;
 			}
 		}
 

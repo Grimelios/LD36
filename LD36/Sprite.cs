@@ -14,13 +14,13 @@ namespace LD36
 			texture = ContentLoader.LoadTexture(textureFilename);
 			origin = new Vector2(texture.Width, texture.Height) / 2;
 			Position = position;
-			Scale = 1;
+			Scale = Vector2.One;
 		}
 
 		public Vector2 Position { get; set; }
+		public Vector2 Scale { get; set; }
 
 		public float Rotation { get; set; }
-		public float Scale { get; set; }
 
 		public void Render(SpriteBatch sb)
 		{

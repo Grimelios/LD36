@@ -19,23 +19,27 @@ namespace LD36.Timing
 			for (int i = Timers.Count - 1; i >= 0; i--)
 			{
 				Timer timer = Timers[i];
-				timer.Elapsed += elapsed;
 
-				if (timer.Elapsed >= timer.Duration)
+				if (!timer.Paused)
 				{
-					timer.Trigger();
+					timer.Elapsed += elapsed;
 
-					if (timer.Repeating)
+					if (timer.Elapsed >= timer.Duration)
 					{
-						timer.Elapsed -= timer.Duration;
+						timer.Trigger();
+
+						if (timer.Repeating)
+						{
+							timer.Elapsed -= timer.Duration;
+						}
+						else
+						{
+							Timers.RemoveAt(i);
+						}
 					}
-					else
-					{
-						Timers.RemoveAt(i);
-					}
+
+					timer.Progress = timer.Elapsed / timer.Duration;
 				}
-
-				timer.Progress = timer.Elapsed / timer.Duration;
 			}
 		}
 	}

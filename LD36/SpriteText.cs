@@ -6,9 +6,6 @@ namespace LD36
 {
 	internal class SpriteText : IRenderable
 	{
-		// This color is papyrus (at least according to google).
-		private static readonly Color papyrusTint = new Color(238, 223, 166);
-
 		private SpriteFont font;
 
 		private string text;
@@ -23,13 +20,14 @@ namespace LD36
 		}
 
 		public Vector2 Position { get; set; }
+		public Color Tint { get; set; }
 
 		public float Rotation { get; set; }
 		public float Scale { get; set; }
 
 		public void Render(SpriteBatch sb)
 		{
-			sb.DrawString(font, text, Position, papyrusTint, Rotation, Vector2.Zero, Scale, SpriteEffects.None, 0);
+			sb.DrawString(font, text, Position, Tint, Rotation, Vector2.Zero, Scale, SpriteEffects.None, 0);
 		}
 	}
 }

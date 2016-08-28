@@ -6,13 +6,13 @@
 	],
 
 	"UpdateOrder": [
-		"Artifact",
-		"PlayerCharacter"
+		"PlayerCharacter",
+		"Artifact"
 	],
 
 	"RenderOrder": [
 		"Environment.Tilemap",
-		"Artifact",
-		"PlayerCharacter"
+		"PlayerCharacter",
+		"Artifact"
 	] 
 }

@@ -24,6 +24,7 @@ namespace LD36.Timing
 		public float Duration { get; set; }
 		public float Progress { get; set; }
 		public bool Repeating { get; }
+		public bool Paused { get; set; }
 
 		public Action Trigger { get; }
 
