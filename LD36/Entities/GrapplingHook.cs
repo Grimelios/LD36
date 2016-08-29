@@ -22,6 +22,7 @@ namespace LD36.Entities
 
 		private bool stuck;
 		private bool fading;
+		private bool playerHeld;
 
 		public GrapplingHook(Vector2 position, PlayerCharacter player) : base(position)
 		{
@@ -48,12 +49,15 @@ namespace LD36.Entities
 				Body.BodyType = BodyType.Static;
 				stuck = true;
 
-				Body backAnchor = DIKernel.Get<PhysicsFactory>().CreateBody(this);
-				backAnchor.Position = PhysicsConvert.ToMeters(BackPosition);
-				rope = new Rope(this, player);
-				EntityUtilities.AddEntity(rope);
+				if (playerHeld)
+				{
+					Body backAnchor = DIKernel.Get<PhysicsFactory>().CreateBody(this);
+					backAnchor.Position = PhysicsConvert.ToMeters(BackPosition);
+					rope = new Rope(this, player);
+					EntityUtilities.AddEntity(rope);
 
-				player.RegisterGrappleImpact(rope);
+					player.RegisterGrappleImpact(rope);
+				}
 			}
 
 			return false;
@@ -62,10 +66,12 @@ namespace LD36.Entities
 		public void Fire(Vector2 velocity)
 		{
 			Body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
+			playerHeld = true;
 		}
 
 		public void Release()
 		{
+			playerHeld = false;
 			timer = new Timer(FadeDelay, () =>
 			{
 				fading = true;
@@ -78,7 +84,7 @@ namespace LD36.Entities
 			EntityUtilities.RemoveEntity(this);
 			PhysicsUtilities.RemoveBody(Body);
 
-			rope.Destroy();
+			rope?.Destroy();
 		}
 
 		public override void Update(float dt)
@@ -96,7 +102,7 @@ namespace LD36.Entities
 			if (fading)
 			{
 				sprite.Tint = Color.Lerp(Color.White, Color.Transparent, timer.Progress);
-				rope.SetFade(sprite.Tint);
+				rope?.SetFade(sprite.Tint);
 			}
 		}
 

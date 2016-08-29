@@ -25,10 +25,12 @@ namespace LD36.Entities
 		private const int GrappleFireSpeed = 1500;
 		private const int GrappleProximityLimit = 50;
 		private const int SwingImpulse = 4;
-		private const int ClimbAcceleractionUp = 800;
-		private const int ClimbAcceleractionDown = 1200;
-		private const int ClimbMaxSpeedUp = 150;
-		private const int ClimbMaxSpeedDown = 250;
+		private const int ClimbAccelerationUp = 1000;
+		private const int ClimbAccelerationDown = 1200;
+		private const int ClimbDecelerationUp = 800;
+		private const int ClimbDecelerationDown = 1000;
+		private const int ClimbMaxSpeedUp = 175;
+		private const int ClimbMaxSpeedDown = 275;
 
 		private Sprite sprite;
 		private Artifact activeArtifact;
@@ -208,7 +210,8 @@ namespace LD36.Entities
 					onGround = false;
 				}
 			}
-			else if (data.KeysReleasedThisFrame.Contains(Keys.Space))
+
+			if (data.KeysReleasedThisFrame.Contains(Keys.Space))
 			{
 				LimitJump();
 			}
@@ -279,14 +282,17 @@ namespace LD36.Entities
 			grapple.Release();
 			grapple = null;
 
-			rope.RegisterPlayerDetach();
-			rope = null;
+			if (rope != null)
+			{
+				rope.RegisterPlayerDetach();
+				rope = null;
+			}
 		}
 
 		public void RegisterGrappleImpact(Rope rope)
 		{
 			this.rope = rope;
-			
+
 			attachedToRope = true;
 		}
 
@@ -313,14 +319,25 @@ namespace LD36.Entities
 		private void UpdateClimbing(float dt)
 		{
 			// Like running, these values are mutually exclusive.
-			if (climbingUp || climbingDown && climbSpeed != 0)
+			if (climbingUp || climbingDown)
 			{
-				float acceleration = climbingUp ? -ClimbAcceleractionUp : ClimbAcceleractionDown;
+				float acceleration = climbingUp ? -ClimbAccelerationUp : ClimbAccelerationDown;
 				climbSpeed += acceleration * dt;
 				climbSpeed = MathHelper.Clamp(climbSpeed, -ClimbMaxSpeedUp, ClimbMaxSpeedDown);
-
-				Body.Position = PhysicsConvert.ToMeters(rope.Climb(ref climbSpeed, dt));
 			}
+			else if (climbSpeed != 0)
+			{
+				float deceleration = climbSpeed < 0 ? ClimbDecelerationUp : ClimbDecelerationDown;
+				int previousSign = Math.Sign(climbSpeed);
+				climbSpeed -= deceleration * previousSign * dt;
+
+				if (Math.Sign(climbSpeed) != previousSign)
+				{
+					climbSpeed = 0;
+				}
+			}
+			
+			Body.Position = PhysicsConvert.ToMeters(rope.Climb(ref climbSpeed, dt));
 		}
 
 		private void UpdateRunning(float dt)

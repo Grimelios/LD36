@@ -11,7 +11,7 @@ namespace LD36.Entities
 	internal class Rope : Entity
 	{
 		private const int DefaultSegmentLength = 20;
-		private const float JointBreakpoint = 100000;
+		private const float PlayerEndOffset = 0.01f;
 
 		private Body playerBody;
 		private List<Body> bodies;
@@ -55,7 +55,7 @@ namespace LD36.Entities
 
 				if (i > 0)
 				{
-					physicsFactory.CreateRevoluteJoint(body, bodies[i - 1], -anchor, anchor, JointBreakpoint, Units.Pixels);
+					physicsFactory.CreateRevoluteJoint(body, bodies[i - 1], -anchor, anchor, Units.Pixels);
 				}
 
 				sprites.Add(new Sprite("Rope", Vector2.Zero));
@@ -65,10 +65,9 @@ namespace LD36.Entities
 			backBody.Position = PhysicsConvert.ToMeters(grapple.BackPosition);
 			playerBody = player.Body;
 
-			physicsFactory.CreateRevoluteJoint(backBody, bodies[0], Vector2.Zero, -anchor, JointBreakpoint, Units.Pixels);
-			playerJoint = physicsFactory.CreateRevoluteJoint(playerBody, bodies[bodies.Count - 1], Vector2.Zero, anchor, JointBreakpoint,
-				Units.Pixels);
-			playerOffset = distance;
+			physicsFactory.CreateRevoluteJoint(backBody, bodies[0], Vector2.Zero, -anchor, Units.Pixels);
+			playerJoint = physicsFactory.CreateRevoluteJoint(playerBody, bodies[bodies.Count - 1], Vector2.Zero, anchor, Units.Pixels);
+			playerOffset = distance - PlayerEndOffset;
 			totalLength = distance;
 		}
 
@@ -94,7 +93,7 @@ namespace LD36.Entities
 
 			if (playerOffset < 0 || playerOffset > totalLength)
 			{
-				playerOffset = MathHelper.Clamp(playerOffset, 0, totalLength - 0.01f);
+				playerOffset = MathHelper.Clamp(playerOffset, 0, totalLength - PlayerEndOffset);
 				climbSpeed = 0;
 			}
 
@@ -110,7 +109,7 @@ namespace LD36.Entities
 			Vector2 segmentAnchor = Vector2.Lerp(-halfLength, halfLength, segmentAmount);
 
 			PhysicsUtilities.RemoveJoint(playerJoint);
-			playerJoint = physicsFactory.CreateRevoluteJoint(playerBody, segmentBody, Vector2.Zero, segmentAnchor, JointBreakpoint, Units.Pixels);
+			playerJoint = physicsFactory.CreateRevoluteJoint(playerBody, segmentBody, Vector2.Zero, segmentAnchor, Units.Pixels);
 
 			return Vector2.Lerp(start, end, segmentAmount);
 		}
