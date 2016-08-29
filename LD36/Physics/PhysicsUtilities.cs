@@ -36,7 +36,7 @@ namespace LD36.Physics
 				return 1;
 			}, source, end);
 
-			return closestFixture == null ? null : new RayCastResults(hitPosition, (Entity)closestFixture.Body.UserData);
+			return closestFixture == null ? null : new RayCastResults(hitPosition, closestFixture.UserData);
 		}
 	}
 }
