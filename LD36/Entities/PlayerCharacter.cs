@@ -20,21 +20,18 @@ namespace LD36.Entities
 		private const int Deceleration = 3000;
 		private const int MaximumSpeed = 450;
 		private const int JumpSpeedInitial = 500;
-		private const int JumpSpeedLimited = 50;
-
-		private enum PlayerAnimationNames
-		{
-			Idle,
-			Running
-		}
+		private const int JumpSpeedLimited = 100;
+		private const int GrappleFireSpeed = 1500;
 
 		private Sprite sprite;
 		private Body body;
 		private Artifact activeArtifact;
+		private GrapplingHook grapple;
 
 		private bool runningLeft;
 		private bool runningRight;
 		private bool onGround;
+		private bool controlEnabled;
 
 		public PlayerCharacter(Vector2 position) : base(position)
 		{
@@ -44,11 +41,14 @@ namespace LD36.Entities
 			body.FixedRotation = true;
 			body.OnCollision += HandleCollision;
 			body.OnSeparation += HandleSeparation;
+			controlEnabled = true;
 
 			MessageSystem messageSystem = DIKernel.Get<MessageSystem>();
 			messageSystem.Subscribe(MessageTypes.Keyboard, this);
 			messageSystem.Subscribe(MessageTypes.Mouse, this);
 		}
+
+		public Body Body => body;
 
 		private bool HandleCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
 		{
@@ -138,7 +138,7 @@ namespace LD36.Entities
 				if (data.KeysPressedThisFrame.Contains(Keys.Space))
 				{
 					velocity.Y = -JumpSpeedInitial;
-					//onGround = false;
+					onGround = false;
 				}
 			}
 			else if (data.KeysReleasedThisFrame.Contains(Keys.Space) && velocity.Y < -JumpSpeedLimited)
@@ -151,6 +151,27 @@ namespace LD36.Entities
 
 		public void HandleMouse(MouseData data)
 		{
+			HandleGrapple(data);
+		}
+
+		private void HandleGrapple(MouseData data)
+		{
+			if (data.LeftClickState == ClickStates.PressedThisFrame)
+			{
+				if (grapple == null)
+				{
+					Vector2 grappleVelocity = Vector2.Normalize(data.WorldPosition - Position) * GrappleFireSpeed;
+					grapple = new GrapplingHook(Position, this);
+					grapple.Fire(grappleVelocity);
+
+					EntityUtilities.AddEntity(grapple);
+				}
+			}
+		}
+
+		public void RegisterGrappleImpact()
+		{
+			//controlEnabled = false;
 		}
 
 		public override void Update(float dt)
@@ -159,7 +180,10 @@ namespace LD36.Entities
 			Position = new Vector2((int)convertedPosition.X, (int)convertedPosition.Y);
 			sprite.Position = Position;
 
-			UpdateRunning(dt);
+			if (controlEnabled)
+			{
+				UpdateRunning(dt);
+			}
 		}
 
 		private void UpdateRunning(float dt)

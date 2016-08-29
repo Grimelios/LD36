@@ -2,17 +2,23 @@
 	"MasterList": [
 		"Artifact",
 		"Environment.Tilemap",
-		"PlayerCharacter"
+		"GrapplingHook",
+		"PlayerCharacter",
+		"Rope"
 	],
 
 	"UpdateOrder": [
 		"PlayerCharacter",
-		"Artifact"
+		"Artifact",
+		"GrapplingHook",
+		"Rope"
 	],
 
 	"RenderOrder": [
 		"Environment.Tilemap",
 		"PlayerCharacter",
+		"Rope",
+		"GrapplingHook",
 		"Artifact"
 	] 
 }

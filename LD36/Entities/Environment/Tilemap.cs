@@ -14,26 +14,8 @@ namespace LD36.Entities.Environment
 		private int width;
 		private int height;
 		private int[,] tiles;
-
-		private Body body;
+		
 		private Texture2D tilesheet;
-
-		public Tilemap(TilemapData data) :
-			this(data.Position, data.Width, data.Height, data.Tiles, data.TilesheetFilename)
-		{
-			PhysicsFactory physicsFactory = DIKernel.Get<PhysicsFactory>();
-			body = physicsFactory.CreateBody(this);
-
-			Vector2 convertedPosition = PhysicsConvert.ToMeters(data.Position);
-
-			foreach (Edge edge in data.Edges)
-			{
-				Vector2 start = convertedPosition + edge.Start;
-				Vector2 end = convertedPosition + edge.End;
-
-				physicsFactory.AttachEdge(body, new Edge(start, end, edge.IsGround), Units.Meters);
-			}
-		}
 
 		public Tilemap(Vector2 position, int width, int height, int[,] tiles, string tilesheetFilename) : base(position)
 		{

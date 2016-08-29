@@ -47,8 +47,9 @@
     <Compile Include="Entities\EntityMaster.cs" />
     <Compile Include="Entities\EntityUtilities.cs" />
     <Compile Include="Entities\Environment\Tilemap.cs" />
-    <Compile Include="Entities\Environment\TilemapData.cs" />
+    <Compile Include="Entities\GrapplingHook.cs" />
     <Compile Include="Entities\PlayerCharacter.cs" />
+    <Compile Include="Entities\Rope.cs" />
     <Compile Include="GameFunctions.cs" />
     <Compile Include="Generation\ArtifactGenerator.cs" />
     <Compile Include="Generation\EdgeGenerator.cs" />

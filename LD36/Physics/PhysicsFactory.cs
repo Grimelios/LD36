@@ -1,4 +1,5 @@
 ﻿using FarseerPhysics.Dynamics;
+using FarseerPhysics.Dynamics.Joints;
 using FarseerPhysics.Factories;
 using LD36.Entities;
 using Microsoft.Xna.Framework;
@@ -46,6 +47,17 @@ namespace LD36.Physics
 			Vector2 end = units == Units.Pixels ? PhysicsConvert.ToMeters(edge.End) : edge.End;
 
 			FixtureFactory.AttachEdge(start, end, body, edge);
+		}
+
+		public void CreateRevoluteJoint(Body bodyA, Body bodyB, Vector2 anchorA, Vector2 anchorB, Units units)
+		{
+			if (units == Units.Pixels)
+			{
+				anchorA = PhysicsConvert.ToMeters(anchorA);
+				anchorB = PhysicsConvert.ToMeters(anchorB);
+			}
+
+			JointFactory.CreateRevoluteJoint(world, bodyA, bodyB, anchorA, anchorB);
 		}
 	}
 }

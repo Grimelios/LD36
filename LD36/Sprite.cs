@@ -17,6 +17,15 @@ namespace LD36
 			Scale = Vector2.One;
 		}
 
+		public Sprite(string textureFilename, Vector2 position, Vector2 origin)
+		{
+			this.origin = origin;
+
+			texture = ContentLoader.LoadTexture(textureFilename);
+			Position = position;
+			Scale = Vector2.One;
+		}
+
 		public Vector2 Position { get; set; }
 		public Vector2 Scale { get; set; }
 
