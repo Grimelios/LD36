@@ -24,6 +24,7 @@ namespace LD36.Entities
 		private const int JumpSpeedLimited = 100;
 		private const int GrappleFireSpeed = 1500;
 		private const int GrappleProximityLimit = 50;
+		private const int SwingImpulse = 3;
 
 		private Sprite sprite;
 		private Body ropeEndWeight;
@@ -96,8 +97,16 @@ namespace LD36.Entities
 		public void HandleKeyboard(KeyboardData data)
 		{
 			HandleInteraction(data);
-			HandleRunning(data);
 			HandleJumping(data);
+
+			if (attachedToRope)
+			{
+				HandleRope(data);
+			}
+			else
+			{
+				HandleRunning(data);
+			}
 		}
 
 		private void HandleInteraction(KeyboardData data)
@@ -107,6 +116,29 @@ namespace LD36.Entities
 				activeArtifact?.InteractionResponse(this);
 				activeArtifact = null;
 			}
+		}
+
+		private void HandleRope(KeyboardData data)
+		{
+			HandleSwinging(data);
+			HandleClimbing(data);
+		}
+
+		private void HandleSwinging(KeyboardData data)
+		{
+			bool aDown = data.KeysDown.Contains(Keys.A);
+			bool dDown = data.KeysDown.Contains(Keys.D);
+
+			if (aDown ^ dDown)
+			{
+				float impulse = PhysicsConvert.ToMeters(SwingImpulse);
+				impulse = aDown ? -impulse : impulse;
+				ropeEndWeight.ApplyLinearImpulse(new Vector2(impulse, 0));
+			}
+		}
+
+		private void HandleClimbing(KeyboardData data)
+		{
 		}
 
 		private void HandleRunning(KeyboardData data)
