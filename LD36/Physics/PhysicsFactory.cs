@@ -49,7 +49,7 @@ namespace LD36.Physics
 			FixtureFactory.AttachEdge(start, end, body, edge);
 		}
 
-		public void CreateRevoluteJoint(Body bodyA, Body bodyB, Vector2 anchorA, Vector2 anchorB, Units units)
+		public RevoluteJoint CreateRevoluteJoint(Body bodyA, Body bodyB, Vector2 anchorA, Vector2 anchorB, Units units)
 		{
 			if (units == Units.Pixels)
 			{
@@ -57,7 +57,7 @@ namespace LD36.Physics
 				anchorB = PhysicsConvert.ToMeters(anchorB);
 			}
 
-			JointFactory.CreateRevoluteJoint(world, bodyA, bodyB, anchorA, anchorB);
+			return JointFactory.CreateRevoluteJoint(world, bodyA, bodyB, anchorA, anchorB);
 		}
 	}
 }

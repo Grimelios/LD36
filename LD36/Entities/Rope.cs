@@ -2,6 +2,7 @@
 using FarseerPhysics.Collision.Shapes;
 using FarseerPhysics.Dynamics;
 using FarseerPhysics.Dynamics.Contacts;
+using FarseerPhysics.Dynamics.Joints;
 using LD36.Physics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -56,8 +57,10 @@ namespace LD36.Entities
 			}
 
 			physicsFactory.CreateRevoluteJoint(anchor1, bodies[0], Vector2.Zero, -anchor, Units.Pixels);
-			physicsFactory.CreateRevoluteJoint(anchor2, bodies[bodies.Count - 1], Vector2.Zero, anchor, Units.Pixels);
+			EndJoint = physicsFactory.CreateRevoluteJoint(anchor2, bodies[bodies.Count - 1], Vector2.Zero, anchor, Units.Pixels);
 		}
+
+		public RevoluteJoint EndJoint { get; }
 
 		private bool HandleCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
 		{

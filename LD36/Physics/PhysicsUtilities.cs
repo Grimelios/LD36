@@ -1,4 +1,5 @@
 ﻿using FarseerPhysics.Dynamics;
+using FarseerPhysics.Dynamics.Joints;
 
 namespace LD36.Physics
 {
@@ -9,6 +10,11 @@ namespace LD36.Physics
 		public static void RemoveBody(Body body)
 		{
 			world.RemoveBody(body);
+		}
+
+		public static void RemoveJoint(Joint joint)
+		{
+			world.RemoveJoint(joint);
 		}
 	}
 }

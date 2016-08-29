@@ -40,13 +40,14 @@ namespace LD36.Entities
 
 				body.BodyType = BodyType.Static;
 				stuck = true;
-				player.RegisterGrappleImpact();
 
 				Body backAnchor = DIKernel.Get<PhysicsFactory>().CreateBody(this);
 				backAnchor.Position = PhysicsConvert.ToMeters(BackPosition);
 
 				Rope rope = new Rope(backAnchor, player.Body);
 				EntityUtilities.AddEntity(rope);
+
+				player.RegisterGrappleImpact(rope.EndJoint);
 			}
 
 			return false;
