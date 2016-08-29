@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FarseerPhysics.Dynamics;
 using FarseerPhysics.Dynamics.Contacts;
+using FarseerPhysics.Dynamics.Joints;
 using LD36.Physics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,18 +11,22 @@ namespace LD36.Entities
 	internal class Rope : Entity
 	{
 		private const int DefaultSegmentLength = 20;
+		private const float JointBreakpoint = 100000;
 
+		private Body playerBody;
 		private List<Body> bodies;
 		private List<Sprite> sprites;
-
+		private PhysicsFactory physicsFactory;
+		private RevoluteJoint playerJoint;
+		
 		private float segmentLength;
+		private float totalLength;
+		private float playerOffset;
 
 		public Rope(GrapplingHook grapple, PlayerCharacter player) : base(Vector2.Zero)
 		{
 			Vector2 start = grapple.BackPosition;
 			Vector2 end = player.Position;
-
-			CreateEndWeight(player);
 
 			float distance = Vector2.Distance(start, end);
 			int numSegments = (int)(distance / DefaultSegmentLength);
@@ -34,8 +39,8 @@ namespace LD36.Entities
 			segmentLength = distance / numSegments;
             bodies = new List<Body>();
 			sprites = new List<Sprite>();
+			physicsFactory = DIKernel.Get<PhysicsFactory>();
 
-			PhysicsFactory physicsFactory = DIKernel.Get<PhysicsFactory>();
 			Vector2 direction = Vector2.Normalize(end - start);
 			Vector2 positionIncrement = direction * segmentLength;
 			Vector2 halfIncrement = positionIncrement / 2;
@@ -50,7 +55,7 @@ namespace LD36.Entities
 
 				if (i > 0)
 				{
-					physicsFactory.CreateRevoluteJoint(body, bodies[i - 1], -anchor, anchor, Units.Pixels);
+					physicsFactory.CreateRevoluteJoint(body, bodies[i - 1], -anchor, anchor, JointBreakpoint, Units.Pixels);
 				}
 
 				sprites.Add(new Sprite("Rope", Vector2.Zero));
@@ -58,21 +63,13 @@ namespace LD36.Entities
 
 			Body backBody = physicsFactory.CreateBody(grapple);
 			backBody.Position = PhysicsConvert.ToMeters(grapple.BackPosition);
+			playerBody = player.Body;
 
-			physicsFactory.CreateRevoluteJoint(backBody, bodies[0], Vector2.Zero, -anchor, Units.Pixels);
-			physicsFactory.CreateRevoluteJoint(EndWeight, bodies[bodies.Count - 1], Vector2.Zero, anchor, Units.Pixels);
-		}
-
-		public Body EndWeight { get; private set; }
-
-		private void CreateEndWeight(PlayerCharacter player)
-		{
-			Body playerBody = player.Body;
-
-			EndWeight = DIKernel.Get<PhysicsFactory>().CreateRectangle(1, 1, playerBody.Position, Units.Meters, this);
-			EndWeight.FixedRotation = true;
-			EndWeight.LinearVelocity = playerBody.LinearVelocity;
-			EndWeight.OnCollision += HandleCollision;
+			physicsFactory.CreateRevoluteJoint(backBody, bodies[0], Vector2.Zero, -anchor, JointBreakpoint, Units.Pixels);
+			playerJoint = physicsFactory.CreateRevoluteJoint(playerBody, bodies[bodies.Count - 1], Vector2.Zero, anchor, JointBreakpoint,
+				Units.Pixels);
+			playerOffset = distance;
+			totalLength = distance;
 		}
 
 		private bool HandleCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
@@ -87,14 +84,41 @@ namespace LD36.Entities
 
 		public void RegisterPlayerDetach()
 		{
-			EndWeight.CollidesWith = Category.None;
+			PhysicsUtilities.RemoveJoint(playerJoint);
+			playerJoint = null;
+		}
+
+		public Vector2 Climb(ref float climbSpeed, float dt)
+		{
+			playerOffset += climbSpeed * dt;
+
+			if (playerOffset < 0 || playerOffset > totalLength)
+			{
+				playerOffset = MathHelper.Clamp(playerOffset, 0, totalLength - 0.01f);
+				climbSpeed = 0;
+			}
+
+			int segmentIndex = (int)(playerOffset / segmentLength);
+			float segmentAmount = (playerOffset % segmentLength) / segmentLength;
+
+			Body segmentBody = bodies[segmentIndex];
+			Vector2 segmentPosition = PhysicsConvert.ToPixels(segmentBody.Position);
+			Vector2 halfLength = new Vector2(segmentLength / 2, 0);
+			Vector2 halfVector = Vector2.Transform(halfLength, Matrix.CreateRotationZ(segmentBody.Rotation));
+			Vector2 start = segmentPosition - halfVector;
+			Vector2 end = segmentPosition + halfVector;
+			Vector2 segmentAnchor = Vector2.Lerp(-halfLength, halfLength, segmentAmount);
+
+			PhysicsUtilities.RemoveJoint(playerJoint);
+			playerJoint = physicsFactory.CreateRevoluteJoint(playerBody, segmentBody, Vector2.Zero, segmentAnchor, JointBreakpoint, Units.Pixels);
+
+			return Vector2.Lerp(start, end, segmentAmount);
 		}
 
 		public override void Destroy()
 		{
 			bodies.ForEach(PhysicsUtilities.RemoveBody);
-
-			PhysicsUtilities.RemoveBody(EndWeight);
+			
 			EntityUtilities.RemoveEntity(this);
 		}
 

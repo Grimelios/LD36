@@ -24,18 +24,25 @@ namespace LD36.Entities
 		private const int JumpSpeedLimited = 100;
 		private const int GrappleFireSpeed = 1500;
 		private const int GrappleProximityLimit = 50;
-		private const int SwingImpulse = 3;
+		private const int SwingImpulse = 4;
+		private const int ClimbAcceleractionUp = 800;
+		private const int ClimbAcceleractionDown = 1200;
+		private const int ClimbMaxSpeedUp = 150;
+		private const int ClimbMaxSpeedDown = 250;
 
 		private Sprite sprite;
-		private Body ropeEndWeight;
 		private Artifact activeArtifact;
-		private Rope rope;
 		private GrapplingHook grapple;
+		private Rope rope;
 
 		private bool runningLeft;
 		private bool runningRight;
 		private bool onGround;
 		private bool attachedToRope;
+		private bool climbingUp;
+		private bool climbingDown;
+
+		private float climbSpeed;
 
 		public PlayerCharacter(Vector2 position) : base(position)
 		{
@@ -133,12 +140,30 @@ namespace LD36.Entities
 			{
 				float impulse = PhysicsConvert.ToMeters(SwingImpulse);
 				impulse = aDown ? -impulse : impulse;
-				ropeEndWeight.ApplyLinearImpulse(new Vector2(impulse, 0));
+				Body.ApplyLinearImpulse(new Vector2(impulse, 0));
 			}
 		}
 
 		private void HandleClimbing(KeyboardData data)
 		{
+			bool wDown = data.KeysDown.Contains(Keys.W);
+			bool sDown = data.KeysDown.Contains(Keys.S);
+
+			if (wDown && !sDown)
+			{
+				climbingUp = true;
+				climbingDown = false;
+			}
+			else if (sDown && !wDown)
+			{
+				climbingUp = false;
+				climbingDown = true;
+			}
+			else
+			{
+				climbingUp = false;
+				climbingDown = false;
+			}
 		}
 
 		private void HandleRunning(KeyboardData data)
@@ -234,7 +259,7 @@ namespace LD36.Entities
 		{
 			RayCastResults results = PhysicsUtilities.RayCast(Position, target, GrappleProximityLimit);
 
-			if (results.Entity is Edge && Vector2.Distance(Position, PhysicsConvert.ToPixels(results.Position)) < GrappleProximityLimit)
+			if (results?.Entity is Edge && Vector2.Distance(Position, PhysicsConvert.ToPixels(results.Position)) < GrappleProximityLimit)
 			{
 				return;
 			}
@@ -248,8 +273,6 @@ namespace LD36.Entities
 
 		private void DetachFromRope()
 		{
-			Body.LinearVelocity = ropeEndWeight.LinearVelocity;
-			ropeEndWeight = null;
 			attachedToRope = false;
 			Body.Enabled = true;
 
@@ -263,10 +286,8 @@ namespace LD36.Entities
 		public void RegisterGrappleImpact(Rope rope)
 		{
 			this.rope = rope;
-
-			ropeEndWeight = rope.EndWeight;
+			
 			attachedToRope = true;
-			Body.Enabled = false;
 		}
 
 		public override void Destroy()
@@ -277,7 +298,7 @@ namespace LD36.Entities
 		{
 			if (attachedToRope)
 			{
-				UpdateSwinging(dt);
+				UpdateClimbing(dt);
 			}
 			else
 			{
@@ -289,9 +310,17 @@ namespace LD36.Entities
 			sprite.Position = Position;
 		}
 
-		private void UpdateSwinging(float dt)
+		private void UpdateClimbing(float dt)
 		{
-			Body.Position = ropeEndWeight.Position;
+			// Like running, these values are mutually exclusive.
+			if (climbingUp || climbingDown && climbSpeed != 0)
+			{
+				float acceleration = climbingUp ? -ClimbAcceleractionUp : ClimbAcceleractionDown;
+				climbSpeed += acceleration * dt;
+				climbSpeed = MathHelper.Clamp(climbSpeed, -ClimbMaxSpeedUp, ClimbMaxSpeedDown);
+
+				Body.Position = PhysicsConvert.ToMeters(rope.Climb(ref climbSpeed, dt));
+			}
 		}
 
 		private void UpdateRunning(float dt)

@@ -151,7 +151,12 @@ namespace LD36
 
 			// This assumes that the frame rate will behave and pretty much stay at a constant 60FPS. See
 			// http://www.box2d.org/forum/viewtopic.php?t=4785 for more information).
-			world.Step(dt);
+			float dtPhysics = dt / 2;
+
+			for (int i = 0; i < 2; i++)
+			{
+				world.Step(dtPhysics);
+			}
 
 			foreach (Type type in updateOrder)
 			{
