@@ -78,6 +78,7 @@
     <Compile Include="Physics\PhysicsDebug.cs" />
     <Compile Include="Physics\PhysicsFactory.cs" />
     <Compile Include="Physics\PhysicsUtilities.cs" />
+    <Compile Include="Physics\RayCastResults.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenderFunctions.cs" />

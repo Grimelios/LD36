@@ -23,6 +23,7 @@ namespace LD36.Entities
 		private const int JumpSpeedInitial = 500;
 		private const int JumpSpeedLimited = 100;
 		private const int GrappleFireSpeed = 1500;
+		private const int GrappleProximityLimit = 50;
 
 		private Sprite sprite;
 		private Body body;
@@ -33,6 +34,7 @@ namespace LD36.Entities
 		private bool runningLeft;
 		private bool runningRight;
 		private bool onGround;
+		private bool attachedToRope;
 
 		public PlayerCharacter(Vector2 position) : base(position)
 		{
@@ -131,7 +133,6 @@ namespace LD36.Entities
 
 		private void HandleJumping(KeyboardData data)
 		{
-
 			if (onGround)
 			{
 				if (data.KeysPressedThisFrame.Contains(Keys.Space))
@@ -172,14 +173,10 @@ namespace LD36.Entities
 			{
 				if (data.LeftClickState == ClickStates.PressedThisFrame)
 				{
-					Vector2 grappleVelocity = Vector2.Normalize(data.WorldPosition - Position) * GrappleFireSpeed;
-					grapple = new GrapplingHook(Position, this);
-					grapple.Fire(grappleVelocity);
-
-					EntityUtilities.AddEntity(grapple);
+					FireGrapple(data.WorldPosition);
 				}
 			}
-			else
+			else if (attachedToRope)
 			{
 				if (data.LeftClickState == ClickStates.PressedThisFrame)
 				{
@@ -193,15 +190,35 @@ namespace LD36.Entities
 			}
 		}
 
+		private void FireGrapple(Vector2 target)
+		{
+			RayCastResults results = PhysicsUtilities.RayCast(Position, target, GrappleProximityLimit);
+
+			if (Vector2.Distance(Position, PhysicsConvert.ToPixels(results.Position)) < GrappleProximityLimit)
+			{
+				return;
+			}
+			
+			Vector2 grappleVelocity = Vector2.Normalize(target - Position) * GrappleFireSpeed;
+			grapple = new GrapplingHook(Position, this);
+			grapple.Fire(grappleVelocity);
+
+			EntityUtilities.AddEntity(grapple);
+		}
+
 		private void DetachFromRope()
 		{
 			PhysicsUtilities.RemoveJoint(ropeJoint);
 			ropeJoint = null;
+			grapple = null;
+			attachedToRope = false;
 		}
 
 		public void RegisterGrappleImpact(RevoluteJoint ropeJoint)
 		{
 			this.ropeJoint = ropeJoint;
+
+			attachedToRope = true;
 		}
 
 		public override void Update(float dt)
