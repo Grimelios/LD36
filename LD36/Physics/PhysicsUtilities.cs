@@ -1,5 +1,4 @@
 ﻿using FarseerPhysics.Dynamics;
-using FarseerPhysics.Dynamics.Joints;
 using LD36.Entities;
 using Microsoft.Xna.Framework;
 
@@ -12,11 +11,6 @@ namespace LD36.Physics
 		public static void RemoveBody(Body body)
 		{
 			world.RemoveBody(body);
-		}
-
-		public static void RemoveJoint(Joint joint)
-		{
-			world.RemoveJoint(joint);
 		}
 
 		public static RayCastResults RayCast(Vector2 source, Vector2 target, float range)

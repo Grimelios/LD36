@@ -16,7 +16,6 @@ namespace LD36.Entities
 		private const int FadeTime = 250;
 
 		private Sprite sprite;
-		private Body body;
 		private Rope rope;
 		private Timer timer;
 		private PlayerCharacter player;
@@ -29,10 +28,12 @@ namespace LD36.Entities
 			this.player = player;
 
 			sprite = new Sprite("Grapple", position, new Vector2(20, 5));
-			body = DIKernel.Get<PhysicsFactory>().CreateRectangle(BodyWidth, BodyHeight, position, Units.Pixels, this);
-			body.IsBullet = true;
-			body.OnCollision += HandleCollision;
+			Body = DIKernel.Get<PhysicsFactory>().CreateRectangle(BodyWidth, BodyHeight, position, Units.Pixels, this);
+			Body.IsBullet = true;
+			Body.OnCollision += HandleCollision;
 		}
+
+		public Body Body { get; }
 
 		public Vector2 BackPosition { get; private set; }
 
@@ -44,15 +45,15 @@ namespace LD36.Entities
 			{
 				UpdatePositions();
 
-				body.BodyType = BodyType.Static;
+				Body.BodyType = BodyType.Static;
 				stuck = true;
 
 				Body backAnchor = DIKernel.Get<PhysicsFactory>().CreateBody(this);
 				backAnchor.Position = PhysicsConvert.ToMeters(BackPosition);
-				rope = new Rope(backAnchor, player.Body);
+				rope = new Rope(this, player);
 				EntityUtilities.AddEntity(rope);
 
-				player.RegisterGrappleImpact(rope.EndJoint);
+				player.RegisterGrappleImpact(rope);
 			}
 
 			return false;
@@ -60,7 +61,7 @@ namespace LD36.Entities
 
 		public void Fire(Vector2 velocity)
 		{
-			body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
+			Body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
 		}
 
 		public void Release()
@@ -75,7 +76,7 @@ namespace LD36.Entities
 		public override void Destroy()
 		{
 			EntityUtilities.RemoveEntity(this);
-			PhysicsUtilities.RemoveBody(body);
+			PhysicsUtilities.RemoveBody(Body);
 
 			rope.Destroy();
 		}
@@ -84,9 +85,9 @@ namespace LD36.Entities
 		{
 			if (!stuck)
 			{
-				float rotation = GameFunctions.ComputeAngle(body.LinearVelocity);
+				float rotation = GameFunctions.ComputeAngle(Body.LinearVelocity);
 
-				body.Rotation = rotation;
+				Body.Rotation = rotation;
 				sprite.Rotation = rotation;
 
 				UpdatePositions();
@@ -101,7 +102,7 @@ namespace LD36.Entities
 
 		private void UpdatePositions()
 		{
-			Position = PhysicsConvert.ToPixels(body.Position);
+			Position = PhysicsConvert.ToPixels(Body.Position);
 			sprite.Position = Position;
 			BackPosition = Position - GameFunctions.ComputeDirection(sprite.Rotation) * BackOffset;
 		}

@@ -26,10 +26,10 @@ namespace LD36.Entities
 		private const int GrappleProximityLimit = 50;
 
 		private Sprite sprite;
-		private Body body;
+		private Body ropeEndWeight;
 		private Artifact activeArtifact;
+		private Rope rope;
 		private GrapplingHook grapple;
-		private RevoluteJoint ropeJoint;
 
 		private bool runningLeft;
 		private bool runningRight;
@@ -39,18 +39,18 @@ namespace LD36.Entities
 		public PlayerCharacter(Vector2 position) : base(position)
 		{
 			sprite = new Sprite("Player", position);
-			body = DIKernel.Get<PhysicsFactory>().CreateRectangle(BodyWidth, BodyHeight, position, Units.Pixels, this);
-			body.Friction = 0;
-			body.FixedRotation = true;
-			body.OnCollision += HandleCollision;
-			body.OnSeparation += HandleSeparation;
+			Body = DIKernel.Get<PhysicsFactory>().CreateRectangle(BodyWidth, BodyHeight, position, Units.Pixels, this);
+			Body.Friction = 0;
+			Body.FixedRotation = true;
+			Body.OnCollision += HandleCollision;
+			Body.OnSeparation += HandleSeparation;
 
 			MessageSystem messageSystem = DIKernel.Get<MessageSystem>();
 			messageSystem.Subscribe(MessageTypes.Keyboard, this);
 			messageSystem.Subscribe(MessageTypes.Mouse, this);
 		}
 
-		public Body Body => body;
+		public Body Body { get; }
 
 		private bool HandleCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
 		{
@@ -133,24 +133,28 @@ namespace LD36.Entities
 
 		private void HandleJumping(KeyboardData data)
 		{
-			if (onGround)
+			bool spacePressedThisFrame = data.KeysPressedThisFrame.Contains(Keys.Space);
+
+			if (attachedToRope)
 			{
-				if (data.KeysPressedThisFrame.Contains(Keys.Space))
+				if (spacePressedThisFrame)
+				{
+					DetachFromRope();
+					Jump();
+				}
+			}
+			else if (onGround)
+			{
+				if (spacePressedThisFrame)
 				{
 					Jump();
+					onGround = false;
 				}
 			}
 			else if (data.KeysReleasedThisFrame.Contains(Keys.Space))
 			{
-				Vector2 velocity = PhysicsConvert.ToPixels(body.LinearVelocity);
-
-				if (velocity.Y < -JumpSpeedLimited)
-				{
-					velocity.Y = -JumpSpeedLimited;
-					body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
-				}
+				LimitJump();
 			}
-
 		}
 
 		public void HandleMouse(MouseData data)
@@ -160,11 +164,23 @@ namespace LD36.Entities
 
 		private void Jump()
 		{
-			Vector2 velocity = PhysicsConvert.ToPixels(body.LinearVelocity);
-			velocity.Y = -JumpSpeedInitial;
-			body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
+			Vector2 velocity = PhysicsConvert.ToPixels(Body.LinearVelocity);
+			velocity.Y -= JumpSpeedInitial;
+			velocity.Y = velocity.Y < -JumpSpeedInitial ? -JumpSpeedInitial : velocity.Y;
+			Body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
+		}
 
-			onGround = false;
+		private void LimitJump()
+		{
+			Vector2 velocity = PhysicsConvert.ToPixels(Body.LinearVelocity);
+
+			if (velocity.Y < -JumpSpeedLimited)
+			{
+				velocity.Y = -JumpSpeedLimited;
+				Body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
+			}
+
+			Body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
 		}
 
 		private void HandleGrapple(MouseData data)
@@ -176,17 +192,9 @@ namespace LD36.Entities
 					FireGrapple(data.WorldPosition);
 				}
 			}
-			else if (attachedToRope)
+			else if (data.LeftClickState == ClickStates.ReleasedThisFrame)
 			{
-				if (data.LeftClickState == ClickStates.PressedThisFrame)
-				{
-					Jump();
-					DetachFromRope();
-				}
-				else if (data.RightClickState == ClickStates.PressedThisFrame)
-				{
-					DetachFromRope();
-				}
+				DetachFromRope();
 			}
 		}
 
@@ -194,7 +202,7 @@ namespace LD36.Entities
 		{
 			RayCastResults results = PhysicsUtilities.RayCast(Position, target, GrappleProximityLimit);
 
-			if (Vector2.Distance(Position, PhysicsConvert.ToPixels(results.Position)) < GrappleProximityLimit)
+			if (results.Entity is Edge && Vector2.Distance(Position, PhysicsConvert.ToPixels(results.Position)) < GrappleProximityLimit)
 			{
 				return;
 			}
@@ -208,19 +216,25 @@ namespace LD36.Entities
 
 		private void DetachFromRope()
 		{
-			PhysicsUtilities.RemoveJoint(ropeJoint);
-			ropeJoint = null;
+			Body.LinearVelocity = ropeEndWeight.LinearVelocity;
+			ropeEndWeight = null;
 			attachedToRope = false;
+			Body.Enabled = true;
 
 			grapple.Release();
 			grapple = null;
+
+			rope.RegisterPlayerDetach();
+			rope = null;
 		}
 
-		public void RegisterGrappleImpact(RevoluteJoint ropeJoint)
+		public void RegisterGrappleImpact(Rope rope)
 		{
-			this.ropeJoint = ropeJoint;
+			this.rope = rope;
 
+			ropeEndWeight = rope.EndWeight;
 			attachedToRope = true;
+			Body.Enabled = false;
 		}
 
 		public override void Destroy()
@@ -229,16 +243,28 @@ namespace LD36.Entities
 
 		public override void Update(float dt)
 		{
-			Vector2 convertedPosition = PhysicsConvert.ToPixels(body.Position);
+			if (attachedToRope)
+			{
+				UpdateSwinging(dt);
+			}
+			else
+			{
+				UpdateRunning(dt);
+			}
+
+			Vector2 convertedPosition = PhysicsConvert.ToPixels(Body.Position);
 			Position = new Vector2((int)convertedPosition.X, (int)convertedPosition.Y);
 			sprite.Position = Position;
-			
-			UpdateRunning(dt);
+		}
+
+		private void UpdateSwinging(float dt)
+		{
+			Body.Position = ropeEndWeight.Position;
 		}
 
 		private void UpdateRunning(float dt)
 		{
-			Vector2 velocity = PhysicsConvert.ToPixels(body.LinearVelocity);
+			Vector2 velocity = PhysicsConvert.ToPixels(Body.LinearVelocity);
 
 			// These values are mutually exclusive.
 			if (runningLeft || runningRight)
@@ -262,7 +288,7 @@ namespace LD36.Entities
 				}
 			}
 
-			body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
+			Body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
 		}
 
 		public override void Render(SpriteBatch sb)

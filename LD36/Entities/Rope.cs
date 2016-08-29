@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using FarseerPhysics.Dynamics;
 using FarseerPhysics.Dynamics.Contacts;
-using FarseerPhysics.Dynamics.Joints;
 using LD36.Physics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,10 +16,12 @@ namespace LD36.Entities
 
 		private float segmentLength;
 
-		public Rope(Body anchor1, Body anchor2) : base(Vector2.Zero)
+		public Rope(GrapplingHook grapple, PlayerCharacter player) : base(Vector2.Zero)
 		{
-			Vector2 start = PhysicsConvert.ToPixels(anchor1.Position);
-			Vector2 end = PhysicsConvert.ToPixels(anchor2.Position);
+			Vector2 start = grapple.BackPosition;
+			Vector2 end = player.Position;
+
+			CreateEndWeight(player);
 
 			float distance = Vector2.Distance(start, end);
 			int numSegments = (int)(distance / DefaultSegmentLength);
@@ -55,11 +56,24 @@ namespace LD36.Entities
 				sprites.Add(new Sprite("Rope", Vector2.Zero));
 			}
 
-			physicsFactory.CreateRevoluteJoint(anchor1, bodies[0], Vector2.Zero, -anchor, Units.Pixels);
-			EndJoint = physicsFactory.CreateRevoluteJoint(anchor2, bodies[bodies.Count - 1], Vector2.Zero, anchor, Units.Pixels);
+			Body backBody = physicsFactory.CreateBody(grapple);
+			backBody.Position = PhysicsConvert.ToMeters(grapple.BackPosition);
+
+			physicsFactory.CreateRevoluteJoint(backBody, bodies[0], Vector2.Zero, -anchor, Units.Pixels);
+			physicsFactory.CreateRevoluteJoint(EndWeight, bodies[bodies.Count - 1], Vector2.Zero, anchor, Units.Pixels);
 		}
 
-		public RevoluteJoint EndJoint { get; }
+		public Body EndWeight { get; private set; }
+
+		private void CreateEndWeight(PlayerCharacter player)
+		{
+			Body playerBody = player.Body;
+
+			EndWeight = DIKernel.Get<PhysicsFactory>().CreateRectangle(1, 1, playerBody.Position, Units.Meters, this);
+			EndWeight.FixedRotation = true;
+			EndWeight.LinearVelocity = playerBody.LinearVelocity;
+			EndWeight.OnCollision += HandleCollision;
+		}
 
 		private bool HandleCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
 		{
@@ -71,10 +85,16 @@ namespace LD36.Entities
 			sprites.ForEach(s => s.Tint = tint);
 		}
 
+		public void RegisterPlayerDetach()
+		{
+			EndWeight.CollidesWith = Category.None;
+		}
+
 		public override void Destroy()
 		{
 			bodies.ForEach(PhysicsUtilities.RemoveBody);
 
+			PhysicsUtilities.RemoveBody(EndWeight);
 			EntityUtilities.RemoveEntity(this);
 		}
 

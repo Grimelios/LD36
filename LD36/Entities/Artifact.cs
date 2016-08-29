@@ -93,8 +93,6 @@ namespace LD36.Entities
 			MessageSystem messageSystem = DIKernel.Get<MessageSystem>();
 			messageSystem.Subscribe(MessageTypes.Artifact, this);
 			messageSystem.Send(new ArtifactMessage());
-
-			PhysicsUtilities.RemoveBody(body);
 		}
 
 		public override void Destroy()
