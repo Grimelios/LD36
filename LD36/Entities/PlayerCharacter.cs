@@ -36,7 +36,6 @@ namespace LD36.Entities
 		private Artifact activeArtifact;
 		private GrapplingHook grapple;
 		private Rope rope;
-		private Texture2D ropeShortTexture;
 
 		private bool runningLeft;
 		private bool runningRight;
@@ -50,7 +49,6 @@ namespace LD36.Entities
 		public PlayerCharacter(Vector2 position) : base(position)
 		{
 			sprite = new Sprite("Player", position);
-			ropeShortTexture = ContentLoader.LoadTexture("RopeShort");
 			Body = DIKernel.Get<PhysicsFactory>().CreateRectangle(BodyWidth, BodyHeight, position, Units.Pixels, this);
 			Body.Friction = 0;
 			Body.FixedRotation = true;
@@ -374,21 +372,6 @@ namespace LD36.Entities
 		public override void Render(SpriteBatch sb)
 		{
 			sprite.Render(sb);
-
-			if (grapple != null && !attachedToRope)
-			{
-				RenderDummyRope(sb);
-			}
-		}
-
-		private void RenderDummyRope(SpriteBatch sb)
-		{
-			float length = Vector2.Distance(Position, grapple.BackPosition);
-			float rotation = GameFunctions.ComputeAngle(Position, grapple.BackPosition);
-
-			Rectangle sourceRect = new Rectangle(0, 0, (int)length, ropeShortTexture.Height);
-
-			sb.Draw(ropeShortTexture, Position, sourceRect, Color.White, rotation, Vector2.Zero, 1, SpriteEffects.None, 0);
 		}
 	}
 }

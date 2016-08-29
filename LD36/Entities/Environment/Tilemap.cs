@@ -1,6 +1,4 @@
-﻿using FarseerPhysics.Dynamics;
-using LD36.Physics;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using static LD36.Constants;

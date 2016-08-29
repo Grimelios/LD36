@@ -43,7 +43,6 @@ namespace LD36
 		private List<Type> renderOrder;
 
 		private PyramidGenerator pyramidGenerator;
-		private Texture2D mapTexture;
 		private Texture2D lightTexture;
 
 		public LDGame()
@@ -86,7 +85,6 @@ namespace LD36
 
 			pyramidGenerator = new PyramidGenerator(PyramidSize, PyramidScaleMultiplier);
 			pyramidGenerator.Generate();
-			mapTexture = pyramidGenerator.Texture;
 
 			PlayerCharacter player = new PlayerCharacter(new Vector2(775, 7070));
 			entityLayers[typeof(PlayerCharacter)].Add(player);
@@ -172,7 +170,7 @@ namespace LD36
 			// This color matches the exterior background color inside the pyramid.
 			GraphicsDevice.Clear(new Color(10, 4, 0));
 
-			spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, camera.Transform);
+			spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.LinearWrap, null, null, null, camera.Transform);
 
 			foreach (Type type in renderOrder)
 			{

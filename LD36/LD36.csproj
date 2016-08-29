@@ -43,6 +43,7 @@
     <Compile Include="ContentLoader.cs" />
     <Compile Include="DIKernel.cs" />
     <Compile Include="Entities\Artifact.cs" />
+    <Compile Include="Entities\DummyRope.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\EntityMaster.cs" />
     <Compile Include="Entities\EntityUtilities.cs" />

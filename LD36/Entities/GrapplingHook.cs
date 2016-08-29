@@ -17,6 +17,8 @@ namespace LD36.Entities
 
 		private Sprite sprite;
 		private Rope rope;
+		private DummyRope dummyRope;
+		private Vector2 dummyRopeEndOffset;
 		private Timer timer;
 		private PlayerCharacter player;
 
@@ -29,12 +31,17 @@ namespace LD36.Entities
 			this.player = player;
 
 			sprite = new Sprite("Grapple", position, new Vector2(20, 5));
-			Body = DIKernel.Get<PhysicsFactory>().CreateRectangle(BodyWidth, BodyHeight, position, Units.Pixels, this);
+			dummyRope = new DummyRope(this);
+
+			PhysicsFactory physicsFactory = DIKernel.Get<PhysicsFactory>();
+			Body = physicsFactory.CreateRectangle(BodyWidth, BodyHeight, position, Units.Pixels, this);
 			Body.IsBullet = true;
 			Body.OnCollision += HandleCollision;
+			BackBody = physicsFactory.CreateBody(this);
 		}
 
 		public Body Body { get; }
+		public Body BackBody { get; }
 
 		public Vector2 BackPosition { get; private set; }
 
@@ -49,15 +56,16 @@ namespace LD36.Entities
 				Body.BodyType = BodyType.Static;
 				stuck = true;
 
+				Vector2 ropeEndPosition = playerHeld ? player.Position : BackPosition + dummyRopeEndOffset;
+				rope = new Rope(this, ropeEndPosition, playerHeld ? player.Body : null);
+				EntityUtilities.AddEntity(rope);
+
 				if (playerHeld)
 				{
-					Body backAnchor = DIKernel.Get<PhysicsFactory>().CreateBody(this);
-					backAnchor.Position = PhysicsConvert.ToMeters(BackPosition);
-					rope = new Rope(this, player);
-					EntityUtilities.AddEntity(rope);
-
 					player.RegisterGrappleImpact(rope);
 				}
+
+				dummyRope = null;
 			}
 
 			return false;
@@ -67,6 +75,7 @@ namespace LD36.Entities
 		{
 			Body.LinearVelocity = PhysicsConvert.ToMeters(velocity);
 			playerHeld = true;
+			dummyRope = new DummyRope(this);
 		}
 
 		public void Release()
@@ -77,6 +86,11 @@ namespace LD36.Entities
 				fading = true;
 				timer = new Timer(FadeTime, Destroy, false);
 			}, false);
+
+			if (!stuck)
+			{
+				dummyRopeEndOffset = player.Position - BackPosition;
+			}
 		}
 
 		public override void Destroy()
@@ -95,6 +109,8 @@ namespace LD36.Entities
 
 				Body.Rotation = rotation;
 				sprite.Rotation = rotation;
+				dummyRope.Position = BackPosition;
+				dummyRope.EndPosition = playerHeld ? player.Position : BackPosition + dummyRopeEndOffset;
 
 				UpdatePositions();
 			}
@@ -104,6 +120,8 @@ namespace LD36.Entities
 				sprite.Tint = Color.Lerp(Color.White, Color.Transparent, timer.Progress);
 				rope?.SetFade(sprite.Tint);
 			}
+
+			BackBody.Position = PhysicsConvert.ToMeters(BackPosition);
 		}
 
 		private void UpdatePositions()
@@ -115,6 +133,7 @@ namespace LD36.Entities
 
 		public override void Render(SpriteBatch sb)
 		{
+			dummyRope?.Render(sb);
 			sprite.Render(sb);
 		}
 	}

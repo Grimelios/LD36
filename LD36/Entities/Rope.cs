@@ -23,10 +23,12 @@ namespace LD36.Entities
 		private float totalLength;
 		private float playerOffset;
 
-		public Rope(GrapplingHook grapple, PlayerCharacter player) : base(Vector2.Zero)
+		public Rope(GrapplingHook grapple, Vector2 endPosition, Body playerBody) : base(Vector2.Zero)
 		{
+			this.playerBody = playerBody;
+
 			Vector2 start = grapple.BackPosition;
-			Vector2 end = player.Position;
+			Vector2 end = endPosition;
 
 			float distance = Vector2.Distance(start, end);
 			int numSegments = (int)(distance / DefaultSegmentLength);
@@ -60,13 +62,14 @@ namespace LD36.Entities
 
 				sprites.Add(new Sprite("Rope", Vector2.Zero));
 			}
+			
+			physicsFactory.CreateRevoluteJoint(grapple.BackBody, bodies[0], Vector2.Zero, -anchor, Units.Pixels);
 
-			Body backBody = physicsFactory.CreateBody(grapple);
-			backBody.Position = PhysicsConvert.ToMeters(grapple.BackPosition);
-			playerBody = player.Body;
+			if (playerBody != null)
+			{
+				playerJoint = physicsFactory.CreateRevoluteJoint(playerBody, bodies[bodies.Count - 1], Vector2.Zero, anchor, Units.Pixels);
+			}
 
-			physicsFactory.CreateRevoluteJoint(backBody, bodies[0], Vector2.Zero, -anchor, Units.Pixels);
-			playerJoint = physicsFactory.CreateRevoluteJoint(playerBody, bodies[bodies.Count - 1], Vector2.Zero, anchor, Units.Pixels);
 			playerOffset = distance - PlayerEndOffset;
 			totalLength = distance;
 		}
