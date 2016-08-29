@@ -29,7 +29,7 @@ namespace LD36.Entities
 		private const int ClimbAccelerationDown = 1200;
 		private const int ClimbDecelerationUp = 800;
 		private const int ClimbDecelerationDown = 1000;
-		private const int ClimbMaxSpeedUp = 175;
+		private const int ClimbMaxSpeedUp = 225;
 		private const int ClimbMaxSpeedDown = 275;
 
 		private Sprite sprite;
