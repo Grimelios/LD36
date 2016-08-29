@@ -26,6 +26,10 @@ namespace LD36.Entities.Environment
 			tilesheet = ContentLoader.LoadTexture("Tilesheets/" + tilesheetFilename);
 		}
 
+		public override void Destroy()
+		{
+		}
+
 		public override void Update(float dt)
 		{
 		}

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FarseerPhysics.Collision.Shapes;
 using FarseerPhysics.Dynamics;
 using FarseerPhysics.Dynamics.Contacts;
 using FarseerPhysics.Dynamics.Joints;
@@ -65,6 +64,18 @@ namespace LD36.Entities
 		private bool HandleCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
 		{
 			return fixtureB.UserData is Edge;
+		}
+
+		public void SetFade(Color tint)
+		{
+			sprites.ForEach(s => s.Tint = tint);
+		}
+
+		public override void Destroy()
+		{
+			bodies.ForEach(PhysicsUtilities.RemoveBody);
+
+			EntityUtilities.RemoveEntity(this);
 		}
 
 		public override void Update(float dt)

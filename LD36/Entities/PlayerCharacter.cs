@@ -210,8 +210,10 @@ namespace LD36.Entities
 		{
 			PhysicsUtilities.RemoveJoint(ropeJoint);
 			ropeJoint = null;
-			grapple = null;
 			attachedToRope = false;
+
+			grapple.Release();
+			grapple = null;
 		}
 
 		public void RegisterGrappleImpact(RevoluteJoint ropeJoint)
@@ -219,6 +221,10 @@ namespace LD36.Entities
 			this.ropeJoint = ropeJoint;
 
 			attachedToRope = true;
+		}
+
+		public override void Destroy()
+		{
 		}
 
 		public override void Update(float dt)

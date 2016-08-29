@@ -13,6 +13,7 @@ namespace LD36.Entities
 
 		public Vector2 Position { get; set; }
 
+		public abstract void Destroy();
 		public abstract void Update(float dt);
 		public abstract void Render(SpriteBatch sb);
 	}

@@ -11,29 +11,35 @@ namespace LD36
 
 		public Sprite(string textureFilename, Vector2 position)
 		{
-			texture = ContentLoader.LoadTexture(textureFilename);
+			SetCommonValues(textureFilename, position);
+
 			origin = new Vector2(texture.Width, texture.Height) / 2;
-			Position = position;
-			Scale = Vector2.One;
 		}
 
 		public Sprite(string textureFilename, Vector2 position, Vector2 origin)
 		{
 			this.origin = origin;
+			
+			SetCommonValues(textureFilename, position);
+		}
 
+		private void SetCommonValues(string textureFilename, Vector2 position)
+		{
 			texture = ContentLoader.LoadTexture(textureFilename);
 			Position = position;
 			Scale = Vector2.One;
+			Tint = Color.White;
 		}
 
 		public Vector2 Position { get; set; }
 		public Vector2 Scale { get; set; }
+		public Color Tint { get; set; }
 
 		public float Rotation { get; set; }
 
 		public void Render(SpriteBatch sb)
 		{
-			sb.Draw(texture, Position, null, Color.White, Rotation, origin, Scale, SpriteEffects.None, 0);
+			sb.Draw(texture, Position, null, Tint, Rotation, origin, Scale, SpriteEffects.None, 0);
 		}
 	}
 }
