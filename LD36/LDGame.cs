@@ -25,6 +25,7 @@ namespace LD36
 	{
 		private const int PyramidSize = 75;
 		private const int PyramidScaleMultiplier = 3;
+		private const int PhysicsStepsPerFrame = 2;
         private const float Gravity = 25;
 
 		private GraphicsDeviceManager graphics;
@@ -151,9 +152,9 @@ namespace LD36
 
 			// This assumes that the frame rate will behave and pretty much stay at a constant 60FPS. See
 			// http://www.box2d.org/forum/viewtopic.php?t=4785 for more information).
-			float dtPhysics = dt / 2;
+			float dtPhysics = dt / PhysicsStepsPerFrame;
 
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < PhysicsStepsPerFrame; i++)
 			{
 				world.Step(dtPhysics);
 			}
