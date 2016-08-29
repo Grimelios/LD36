@@ -90,6 +90,7 @@
     <Compile Include="Structures\GraphNode.cs" />
     <Compile Include="Timing\Timer.cs" />
     <Compile Include="Timing\TimerCollection.cs" />
+    <Compile Include="UI\ContinueDialogue.cs" />
     <Compile Include="UI\Dialogue.cs" />
     <Compile Include="UI\DialogueCharacter.cs" />
     <Compile Include="UI\EscapeDialogue.cs" />
@@ -122,7 +123,7 @@
   <ItemGroup>
     <MonoGameContentReference Include="Content\LD36.mgcb" />
     <None Include="Content\Fonts\Dialogue.spritefont" />
-    <None Include="Content\Fonts\DialogueEscape.spritefont" />
+    <None Include="Content\Fonts\DialogueLarge.spritefont" />
     <None Include="Content\Fonts\DialogueSmall.spritefont" />
     <None Include="Content\Json\Entities.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

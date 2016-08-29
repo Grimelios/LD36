@@ -52,18 +52,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Dialogue.spritefont
 
-#begin Fonts/DialogueSmall.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:TextureFormat=Compressed
-/build:Fonts/DialogueSmall.spritefont
-
-#begin Fonts/DialogueEscape.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:TextureFormat=Compressed
-/build:Fonts/DialogueEscape.spritefont
-
 #begin Textures/Tilesheets/Exterior.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -129,4 +117,16 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:TextureFormat=Color
 /build:Textures/RopeShort.png
+
+#begin Fonts/DialogueSmall.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/DialogueSmall.spritefont
+
+#begin Fonts/DialogueLarge.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/DialogueLarge.spritefont
 

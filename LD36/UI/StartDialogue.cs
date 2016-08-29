@@ -11,7 +11,8 @@ namespace LD36.UI
 		private Timer timer;
 		private Timer fadeTimer;
 
-		public StartDialogue(UserInterface userInterface) : base("Dialogue", "Find the three pieces of the ancient artifact.", Offset)
+		public StartDialogue(UserInterface userInterface) :
+			base("Dialogue", "Find the three pieces of the ancient artifact.", Offset)
 		{
 			timer = new Timer(Lifetime, () =>
 			{
