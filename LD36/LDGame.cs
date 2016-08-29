@@ -23,7 +23,7 @@ namespace LD36
 
 	internal class LDGame : Game, IMessageReceiver
 	{
-		private const int PyramidSize = 75;
+		private const int PyramidSize = 50;
 		private const int PyramidScaleMultiplier = 3;
 		private const int PhysicsStepsPerFrame = 2;
         private const float Gravity = 25;
@@ -86,7 +86,7 @@ namespace LD36
 			pyramidGenerator = new PyramidGenerator(PyramidSize, PyramidScaleMultiplier);
 			pyramidGenerator.Generate();
 
-			PlayerCharacter player = new PlayerCharacter(new Vector2(775, 7070));
+			PlayerCharacter player = new PlayerCharacter(new Vector2(775, 4670));
 			entityLayers[typeof(PlayerCharacter)].Add(player);
 			camera.Target = player;
 

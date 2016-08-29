@@ -16,8 +16,8 @@ namespace LD36.Generation
 
 	internal class PyramidGenerator
 	{
-		private const int RoomMinimumSize = 6;
-		private const int RoomMaximumSize = 12;
+		private const int RoomMinimumSize = 4;
+		private const int RoomMaximumSize = 10;
 		private const int MaximumPlacementAttempts = 12;
 		private const int IntroRoomWidth = 12;
 		private const int IntroRoomHeight = 4;
