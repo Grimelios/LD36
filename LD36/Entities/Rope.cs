@@ -61,7 +61,6 @@ namespace LD36.Entities
 
 		private bool HandleCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
 		{
-			//return false;
 			return fixtureB.UserData is Edge;
 		}
 
