@@ -143,9 +143,9 @@ namespace LD36
 		protected override void Update(GameTime gameTime)
 		{
 			float dt = (float)gameTime.ElapsedGameTime.Milliseconds / 1000;
-			
-			timerCollection.Update(dt);
+
 			inputGenerator.GenerateInputEvents();
+			timerCollection.Update(dt);
 			userInterface.Update(dt);
 
 			// This assumes that the frame rate will behave and pretty much stay at a constant 60FPS. See

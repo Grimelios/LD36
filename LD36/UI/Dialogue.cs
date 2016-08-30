@@ -48,7 +48,12 @@ namespace LD36.UI
 			}
 		}
 
-		protected void FadeCharacters(float amount)
+		protected void FadeCharactersIn(float amount)
+		{
+			FadeCharactersOut(1 - amount);
+		}
+
+		protected void FadeCharactersOut(float amount)
 		{
 			characters.ForEach(c => c.Fade(amount));
 		}
