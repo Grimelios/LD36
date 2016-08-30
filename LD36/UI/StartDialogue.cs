@@ -5,7 +5,7 @@ namespace LD36.UI
 	internal class StartDialogue : Dialogue
 	{
 		private const int Offset = 30;
-		private const int Lifetime = 5000;
+		private const int Lifetime = 7500;
 		private const int FadeTime = 500;
 
 		private Timer timer;

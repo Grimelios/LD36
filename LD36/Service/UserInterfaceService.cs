@@ -35,6 +35,7 @@ namespace LD36.Service
 
 				case MessageTypes.Start:
 					userInterface.Elements.Add(DIKernel.Get<StartDialogue>());
+					userInterface.Elements.Add(DIKernel.Get<ControlsUI>());
 					break;
 			}
 		}
