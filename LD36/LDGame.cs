@@ -54,6 +54,7 @@ namespace LD36
 			};
 
 			Content.RootDirectory = "Content";
+			Window.Title = "[Ludum Dare 36] Pyramid Explorer";
 			IsMouseVisible = true;
 		}
 
