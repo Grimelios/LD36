@@ -12,7 +12,9 @@ This is the first completed game I've ever been proud of. I'm likely going to co
 
 If you want to talk to me about anything (feedback, criticism, suggestions, just to chat), the best place to reach me is probably on [Twitter](https://twitter.com/Grimelios) (click the word Twitter). Good luck :)
 
-Controls:
+* * *
+
+*Controls*
 
 WASD: Movement (running, swinging, and climbing)
 E: Interact (collect artifacts)
