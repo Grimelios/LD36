@@ -14,7 +14,7 @@ If you want to talk to me about anything (feedback, criticism, suggestions, just
 
 * * *
 
-*Controls*
+**Controls**
 
 WASD: Movement (running, swinging, and climbing)
 E: Interact (collect artifacts)
