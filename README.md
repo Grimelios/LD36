@@ -16,8 +16,8 @@ If you want to talk to me about anything (feedback, criticism, suggestions, just
 
 **Controls**
 
-WASD: Movement (running, swinging, and climbing)
-E: Interact (collect artifacts)
-Space: Jump (from the ground or the rope and with variable height)
-Left click: Grapple (click/hold to fire, release to let go of the rope)
-Tab: Show objective/controls
++ WASD: Movement (running, swinging, and climbing)
++ E: Interact (collect artifacts)
++ Space: Jump (from the ground or the rope and with variable height)
++ Left click: Grapple (click/hold to fire, release to let go of the rope)
++ Tab: Show objective/controls
